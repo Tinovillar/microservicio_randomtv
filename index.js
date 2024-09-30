@@ -11,11 +11,10 @@ app.use(bodyParser.json())
 
 app.get('/random_top_tv', async (req, res) => {
     let text = '';
-    // let randomTopTv = getRandomTopTv();
-    let randomTopTv = "cars";
     try {
+        let randomTopTv = await getRandomTopTv();
         let randomPrice = await getRandomPrice(); // Espera el resultado de la promesa
-        text = `${randomTopTv} es una de las series más vistas y puedes comprarla por ${randomPrice}`;
+        text = `${randomTopTv} es una de las serie/pelicula más vistas y puedes comprarla por ${randomPrice}`;
         res.send({"texto": text});
     } catch (error) {
         // Manejo de errores si la promesa falla
@@ -30,7 +29,7 @@ app.listen(port, () => {
 async function getRandomTopTv() {
     let randomTopTv;
     try {
-        const response = await fetch(url);
+        const response = await fetch("https://toptrendingmovie.onrender.com/trending");
         if (!response.ok) {
           throw new Error(`Response status: ${response.status}`);
         }
@@ -39,7 +38,7 @@ async function getRandomTopTv() {
       } catch (error) {
         console.error(error.message);
       }
-    return randomTopTv;
+    return randomTopTv.title;
 }
 
 async function getRandomPrice(){
