@@ -9,12 +9,18 @@ app.use(bodyParser.json())
 // Añadimos las rutas
 //app.use(routes)
 
-app.get('/random_top_tv', (req, res) => {
+app.get('/random_top_tv', async (req, res) => {
     let text = '';
     // let randomTopTv = getRandomTopTv();
-    // let randomPrice = getRandomPrice();
-    // text = `${randomTopTv} es una de la series mas vistas y podes comprarla por ${randomPrice}`;
-    res.send({"text":text});
+    let randomTopTv = "cars";
+    try {
+        let randomPrice = await getRandomPrice(); // Espera el resultado de la promesa
+        text = `${randomTopTv} es una de las series más vistas y puedes comprarla por ${randomPrice}`;
+        res.send({"texto": text});
+    } catch (error) {
+        // Manejo de errores si la promesa falla
+        res.status(500).send({"error": "Hubo un problema al obtener el precio."});
+    }
 })
 
 app.listen(port, () => {
@@ -23,7 +29,6 @@ app.listen(port, () => {
 
 async function getRandomTopTv() {
     let randomTopTv;
-    const response = await fetch(url);
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -31,7 +36,6 @@ async function getRandomTopTv() {
         }
     
         randomTopTv = await response.json();
-        console.log(randomTopTv);
       } catch (error) {
         console.error(error.message);
       }
@@ -40,17 +44,15 @@ async function getRandomTopTv() {
 
 async function getRandomPrice(){
     let randomPrice;
-    const response = await fetch(url);
     try {
-        const response = await fetch(url);
+        const response = await fetch("https://preciotawd.onrender.com");
         if (!response.ok) {
           throw new Error(`Response status: ${response.status}`);
         }
     
         randomPrice = await response.json();
-        console.log(randomPrice);
       } catch (error) {
         console.error(error.message);
       }
-    return randomPrice;
+    return `$${randomPrice.precio} ${randomPrice.moneda}`;
 }
